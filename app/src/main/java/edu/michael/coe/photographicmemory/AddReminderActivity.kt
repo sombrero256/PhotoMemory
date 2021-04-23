@@ -10,12 +10,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -84,7 +86,6 @@ class AddReminderActivity : AppCompatActivity() {
         createdReminder!!.time = Time(h, min, 0)
         createdReminder!!.notificationText = findViewById<TextView>(R.id.notificationMessageTextBox).text.toString()
         //copy pic to my external storage
-        Log.d("time", createdReminder!!.date.toString() + createdReminder!!.time.toString())
         /*var original = File(selectedImageURI!!.toString())
         var dir = this.applicationContext.getDir(getString(R.string.imagesdir), MODE_PRIVATE)
         var copyLoc = File(dir.path + "/$numOfReminders")
@@ -117,6 +118,7 @@ class AddReminderActivity : AppCompatActivity() {
         Toast.makeText(this, selectedImageURI!!.path, Toast.LENGTH_LONG).show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun scheduleNotification(n: Notification, d: Long){
 
         val notificationIntent = Intent(this, PhotoNotificationPublisher::class.java)
@@ -126,7 +128,7 @@ class AddReminderActivity : AppCompatActivity() {
         var alarmMgr = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         Toast.makeText(this, alarmMgr.toString(), Toast.LENGTH_LONG).show()
         //sets an alarm d time in the future, where pendingintent p will run
-        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, d, p)
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, d, p)
 
     }
     //maybe add support for showing the bitmap in the notification later
@@ -145,9 +147,11 @@ class AddReminderActivity : AppCompatActivity() {
     fun calculateDelay(d: Date, t: Time): Long{
         var delay : Long = 0
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        var tempDate = sdf.parse("$d $t")
-        delay = ( tempDate.time - System.currentTimeMillis())
+        var tempDate = sdf.parse(d.toString() + " " + t.toString())
+        delay = tempDate!!.time
+        Log.d("time", d.toString() + " " + t.toString())
         Log.d("time", delay.toString())
+
         return delay
     }
 }
