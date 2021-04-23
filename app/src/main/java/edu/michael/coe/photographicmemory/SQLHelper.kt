@@ -13,6 +13,7 @@ const val COL_DATE = "date"
 const val COL_TIME = "time"
 const val COL_URI = "uri"
 const val COL_TEXT = "text"
+const val COL_NOTIF_ID = "notificationId"
 const val COL_ID = "id"
 
 class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, null, 1) {
@@ -27,7 +28,7 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
     private fun createTables(db:SQLiteDatabase?) {
 
         val createReminderTable = "CREATE TABLE " + REMINDERSTABLENAME + " (" + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-         COL_DATE + " VARCHAR(256)," + COL_TIME + " VARCHAR(256)," + COL_URI + " VARCHAR(256)," + COL_TEXT + " VARCHAR(256))"
+         COL_DATE + " VARCHAR(256)," + COL_TIME + " VARCHAR(256)," + COL_URI + " VARCHAR(256)," + COL_TEXT + " VARCHAR(256)," + COL_NOTIF_ID + " INT(255))"
         db?.execSQL(createReminderTable)
     }
 
@@ -39,6 +40,7 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
         cv.put(COL_TIME, r.time.toString())
         cv.put(COL_URI, r.imageURI.toString())
         cv.put(COL_TEXT, r.notificationText)
+        cv.put(COL_NOTIF_ID, r.notificationId.toString())
         val result = database.insert(REMINDERSTABLENAME, null, cv)
         if(result == 0.toLong()){
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show()

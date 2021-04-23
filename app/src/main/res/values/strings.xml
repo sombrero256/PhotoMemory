@@ -3,4 +3,5 @@
     <string name="pref_file_key">PhotoMemPreferencesFile</string>
     <string name="num_reminders_key">num_reminders</string>
     <string name="imagesdir">reminder_images</string>
+    <string name="notifications_channel_id">10001</string>
 </resources>

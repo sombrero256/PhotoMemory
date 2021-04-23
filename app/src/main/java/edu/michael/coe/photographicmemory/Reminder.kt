@@ -10,8 +10,8 @@ class Reminder {
     var time: Time? = null
     var imageURI : Uri? = null
     var notificationText : String? = null
+    var notificationId : Int = -1
 
     constructor(){
-        imageURI = null
     }
 }

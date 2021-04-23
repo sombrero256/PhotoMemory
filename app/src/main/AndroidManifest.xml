@@ -24,6 +24,7 @@
         </activity>
         <activity android:name=".ViewReminderActivity">
         </activity>
+        <receiver android:name= ".PhotoNotificationPublisher" />
     </application>
 
 </manifest>
