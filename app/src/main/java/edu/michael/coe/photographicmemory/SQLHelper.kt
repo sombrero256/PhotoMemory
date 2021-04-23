@@ -47,4 +47,11 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
         }
     }
 
+    fun deleteReminder(r:Reminder){
+        val db = this.readableDatabase
+
+        val del = "DELETE FROM " + REMINDERSTABLENAME + " WHERE " + COL_TEXT + "+" + " \'" + r.notificationText + "\'"
+        db.execSQL(del)
+    }
+
 }
