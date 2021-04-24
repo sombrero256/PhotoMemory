@@ -1,11 +1,16 @@
 package edu.michael.coe.photographicmemory
 
+import android.annotation.SuppressLint
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.net.Uri
 import android.widget.Toast
+import java.sql.Date
+import java.sql.Time
+import java.text.SimpleDateFormat
 
 const val DATABASENAME = "PHOTOMEMDB"
 const val REMINDERSTABLENAME = "Reminders"
@@ -47,6 +52,30 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
         } else {
             Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun getReminder(id:Int) : MutableList<Reminder> {
+        val list: MutableList<Reminder> = ArrayList()
+        val db = this.readableDatabase
+        val query = "Select * from $REMINDERSTABLENAME WHERE $COL_NOTIF_ID = $id"
+        val result = db.rawQuery(query, null)
+        val datesdf = SimpleDateFormat("yyyy-MM-dd")
+        val timesdf = SimpleDateFormat("HH:mm:ss")
+        if(result.moveToFirst()){
+            var r = Reminder()
+            val dString = result.getString(result.getColumnIndex(COL_DATE)).toString()
+            val tString = result.getString(result.getColumnIndex(COL_TIME)).toString()
+            val d = datesdf.parse(dString)
+            val t = timesdf.parse(tString)
+            r.date = Date(d.year, d.month, d.day)
+            r.time = Time(t.hours, t.minutes, t.seconds)
+            r.imageURI = Uri.parse(result.getString(result.getColumnIndex(COL_URI)))
+            r.notificationText = result.getString(result.getColumnIndex(COL_TEXT))
+            r.notificationId = result.getInt(result.getColumnIndex(COL_NOTIF_ID))
+            list.add(r)
+        }
+        return list
     }
 
     fun deleteReminder(r:Reminder){

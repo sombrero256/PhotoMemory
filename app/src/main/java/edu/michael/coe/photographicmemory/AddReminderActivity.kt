@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.Notification
+import android.app.Notification.EXTRA_NOTIFICATION_ID
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -130,18 +131,27 @@ class AddReminderActivity : AppCompatActivity() {
         var p = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         var alarmMgr = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         Toast.makeText(this, alarmMgr.toString(), Toast.LENGTH_LONG).show()
-        //sets an alarm d time in the future, where pendingintent p will run
+        //sets an alarm d for time, where pendingintent p will run
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, d, p)
 
     }
     //maybe add support for showing the bitmap in the notification later
+    //A couple of intents to add actions to our notification
+
     fun buildNotification(notificationText: String): Notification {
+        val snoozeIntent = Intent(this, SnoozeReceive::class.java)
+        snoozeIntent.putExtra(NOTIFICATION_ID, sharedPref!!.getInt(getString(R.string.num_reminders_key), -1))
+
+        //TODO make sure that the flag is correct
+        val snoozePendingIntent = PendingIntent.getBroadcast(this, reqCode, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
         val builder = NotificationCompat.Builder(this, getString(R.string.notifications_channel_id))
         with(builder){
             setSmallIcon(R.mipmap.ic_launcher)
             setContentTitle("Photographic Memory Notification")
             val bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), createdReminder!!.imageURI)
             setLargeIcon(bitmap)
+            addAction(R.mipmap.ic_launcher_round, "Snooze", snoozePendingIntent)
             setContentText(notificationText)
             setChannelId(getString(R.string.notifications_channel_id))
         }
@@ -172,4 +182,6 @@ class AddReminderActivity : AppCompatActivity() {
         //TODO find the directory that pictures are in
         return "/picturedirectorylol/$thePath"
     }
+
+
 }
