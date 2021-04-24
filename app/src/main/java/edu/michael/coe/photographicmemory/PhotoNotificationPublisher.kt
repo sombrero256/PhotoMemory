@@ -24,10 +24,8 @@ class PhotoNotificationPublisher : BroadcastReceiver(){
             val notificationChannel = NotificationChannel(context.getString(R.string.notifications_channel_id), "NOTIFICATION_CHANNEL_NAME", importance)
             assert(notificationManager != null)
             notificationManager!!.createNotificationChannel(notificationChannel)
-
         val id = intent!!.getIntExtra(NOTIFICATION_ID, 0)
         assert(notificationManager != null)
         notificationManager!!.notify(id, notification)
-
     }
 }

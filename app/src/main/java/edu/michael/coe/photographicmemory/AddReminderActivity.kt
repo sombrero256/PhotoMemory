@@ -9,9 +9,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +23,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import java.io.File
 import java.sql.Date
 import java.sql.Time
 import java.text.SimpleDateFormat
@@ -71,6 +74,7 @@ class AddReminderActivity : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun onClickFinishReminder(v: View){
         //Some hardcoded numbers to account for the way the functions work
         val d = findViewById<TextView>(R.id.day).text.toString().toInt()
@@ -86,10 +90,12 @@ class AddReminderActivity : AppCompatActivity() {
         createdReminder!!.time = Time(h, min, 0)
         createdReminder!!.notificationText = findViewById<TextView>(R.id.notificationMessageTextBox).text.toString()
         //copy pic to my external storage
-        /*var original = File(selectedImageURI!!.toString())
+
+        var original = File(getRealPathFromURI(selectedImageURI!!)!!)
         var dir = this.applicationContext.getDir(getString(R.string.imagesdir), MODE_PRIVATE)
         var copyLoc = File(dir.path + "/$numOfReminders")
-        original.copyTo(copyLoc, true, 2056)*/
+        //original.copyTo(copyLoc, true, 2056)
+
         scheduleNotification(buildNotification(createdReminder!!.notificationText!!), calculateDelay(createdReminder!!.date!!, createdReminder!!.time!!))
         var id = sharedPref!!.getInt(getString(R.string.num_reminders_key), -1)
         createdReminder!!.notificationId = id
@@ -115,7 +121,7 @@ class AddReminderActivity : AppCompatActivity() {
             //remove the following line later
             createdReminder!!.imageURI = data!!.data
         }
-        Toast.makeText(this, selectedImageURI!!.path, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, getRealPathFromURI(selectedImageURI!!), Toast.LENGTH_LONG).show()
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -153,5 +159,18 @@ class AddReminderActivity : AppCompatActivity() {
         Log.d("time", delay.toString())
 
         return delay
+    }
+
+    private fun getRealPathFromURI(contentURI: Uri): String? {
+        var thePath = "no-path-found"
+        val filePathColumn = arrayOf(MediaStore.Images.Media.DISPLAY_NAME)
+        val cursor: Cursor? = contentResolver.query(contentURI, null, null, null, null)
+        if (cursor!!.moveToFirst()) {
+            val columnIndex: Int = cursor.getColumnIndex(filePathColumn[0])
+            thePath = cursor.getString(columnIndex)
+        }
+        cursor.close()
+        //TODO find the directory that pictures are in
+        return "/picturedirectorylol/$thePath"
     }
 }
