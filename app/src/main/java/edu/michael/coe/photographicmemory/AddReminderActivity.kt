@@ -23,7 +23,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import java.io.File
 import java.sql.Date
 import java.sql.Time
 import java.text.SimpleDateFormat
@@ -33,7 +32,6 @@ class AddReminderActivity : AppCompatActivity() {
     val reqCode = 100;
     val permCode = 101;
     var createdReminder : Reminder? = null
-    var selectedImageURI : Uri? = null
     var numOfReminders = 0
     var db : SQLHelper? = null
     val NOTIFICATION_ID = "notification-id"
@@ -91,9 +89,9 @@ class AddReminderActivity : AppCompatActivity() {
         createdReminder!!.notificationText = findViewById<TextView>(R.id.notificationMessageTextBox).text.toString()
         //copy pic to my external storage
 
-        var original = File(getRealPathFromURI(selectedImageURI!!)!!)
-        var dir = this.applicationContext.getDir(getString(R.string.imagesdir), MODE_PRIVATE)
-        var copyLoc = File(dir.path + "/$numOfReminders")
+        //var original = File(createdReminder!!.imageURI!!.path)
+        //var dir = this.applicationContext.getDir(getString(R.string.imagesdir), MODE_PRIVATE)
+        //var copyLoc = File(dir.path + "/$numOfReminders")
         //original.copyTo(copyLoc, true, 2056)
 
         scheduleNotification(buildNotification(createdReminder!!.notificationText!!), calculateDelay(createdReminder!!.date!!, createdReminder!!.time!!))
@@ -117,11 +115,10 @@ class AddReminderActivity : AppCompatActivity() {
         if(requestCode == reqCode && resultCode == RESULT_OK){
             var t = findViewById<ImageView>(R.id.imageView)
             t.setImageURI(data!!.data)
-            selectedImageURI = data!!.data
+
             //remove the following line later
             createdReminder!!.imageURI = data!!.data
         }
-        Toast.makeText(this, getRealPathFromURI(selectedImageURI!!), Toast.LENGTH_LONG).show()
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
@@ -143,6 +140,8 @@ class AddReminderActivity : AppCompatActivity() {
         with(builder){
             setSmallIcon(R.mipmap.ic_launcher)
             setContentTitle("Photographic Memory Notification")
+            val bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), createdReminder!!.imageURI)
+            setLargeIcon(bitmap)
             setContentText(notificationText)
             setChannelId(getString(R.string.notifications_channel_id))
         }
