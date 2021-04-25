@@ -1,7 +1,6 @@
 package edu.michael.coe.photographicmemory
 
 import android.annotation.SuppressLint
-import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -63,7 +62,7 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
         val datesdf = SimpleDateFormat("yyyy-MM-dd")
         val timesdf = SimpleDateFormat("HH:mm:ss")
         if(result.moveToFirst()){
-            var r = Reminder()
+            val r = Reminder()
             val dString = result.getString(result.getColumnIndex(COL_DATE)).toString()
             val tString = result.getString(result.getColumnIndex(COL_TIME)).toString()
             val d = datesdf.parse(dString)
@@ -75,6 +74,7 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
             r.notificationId = result.getInt(result.getColumnIndex(COL_NOTIF_ID))
             list.add(r)
         }
+        result.close()
         return list
     }
 

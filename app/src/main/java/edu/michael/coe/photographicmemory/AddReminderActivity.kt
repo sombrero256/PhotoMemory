@@ -4,14 +4,11 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.Notification
-import android.app.Notification.EXTRA_NOTIFICATION_ID
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.database.Cursor
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -29,15 +26,17 @@ import java.sql.Time
 import java.text.SimpleDateFormat
 
 
+const val NOTIFICATION_ID = "notification-id"
+const val NOTIFICATION = "notification"
+
 class AddReminderActivity : AppCompatActivity() {
-    val reqCode = 100;
-    val permCode = 101;
-    var createdReminder : Reminder? = null
-    var numOfReminders = 0
-    var db : SQLHelper? = null
-    val NOTIFICATION_ID = "notification-id"
-    val NOTIFICATION = "notification"
-    var sharedPref : SharedPreferences? = null
+    private val reqCode = 100
+    private val permCode = 101
+    private var createdReminder : Reminder? = null
+    private var numOfReminders = 0
+    private var db : SQLHelper? = null
+
+    private var sharedPref : SharedPreferences? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_addreminder)
@@ -67,8 +66,8 @@ class AddReminderActivity : AppCompatActivity() {
         //select a picture
         //change pick intent to specifically go to gallery later.
         val pickIntent = Intent()
-        pickIntent.setType("image/*")
-        pickIntent.setAction(Intent.ACTION_GET_CONTENT)
+        pickIntent.type = "image/*"
+        pickIntent.action = Intent.ACTION_GET_CONTENT
         startActivityForResult(Intent.createChooser(pickIntent, "Select an image"), reqCode)
 
     }
@@ -115,11 +114,11 @@ class AddReminderActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == reqCode && resultCode == RESULT_OK){
-            var t = findViewById<ImageView>(R.id.imageView)
+            val t = findViewById<ImageView>(R.id.imageView)
             t.setImageURI(data!!.data)
 
             //remove the following line later
-            createdReminder!!.imageURI = data!!.data
+            createdReminder!!.imageURI = data.data
         }
     }
 
@@ -129,8 +128,8 @@ class AddReminderActivity : AppCompatActivity() {
         val notificationIntent = Intent(this, PhotoNotificationPublisher::class.java)
         notificationIntent.putExtra(NOTIFICATION_ID, sharedPref!!.getInt(getString(R.string.num_reminders_key), -1))
         notificationIntent.putExtra(NOTIFICATION, n)
-        var p = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        var alarmMgr = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val p = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val alarmMgr = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         Toast.makeText(this, alarmMgr.toString(), Toast.LENGTH_LONG).show()
         //sets an alarm d for time, where pendingintent p will run
         alarmMgr.setExact(AlarmManager.RTC_WAKEUP, d, p)
@@ -150,7 +149,7 @@ class AddReminderActivity : AppCompatActivity() {
         with(builder){
             setSmallIcon(R.mipmap.ic_launcher)
             setContentTitle("Photographic Memory Notification")
-            val bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), createdReminder!!.imageURI)
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, createdReminder!!.imageURI)
             setLargeIcon(bitmap)
             addAction(R.mipmap.ic_launcher_round, "Snooze", snoozePendingIntent)
             setContentText(notificationText)
@@ -161,17 +160,17 @@ class AddReminderActivity : AppCompatActivity() {
 
     @SuppressLint("SimpleDateFormat")
     fun calculateDelay(d: Date, t: Time): Long{
-        var delay : Long = 0
+
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        var tempDate = sdf.parse(d.toString() + " " + t.toString())
-        delay = tempDate!!.time
-        Log.d("time", d.toString() + " " + t.toString())
+        val tempDate = sdf.parse("$d $t")
+        val delay = tempDate!!.time
+        Log.d("time", "$d $t")
         Log.d("time", delay.toString())
 
         return delay
     }
 
-    private fun getRealPathFromURI(contentURI: Uri): String? {
+    /*private fun getRealPathFromURI(contentURI: Uri): String? {
         var thePath = "no-path-found"
         val filePathColumn = arrayOf(MediaStore.Images.Media.DISPLAY_NAME)
         val cursor: Cursor? = contentResolver.query(contentURI, null, null, null, null)
@@ -180,9 +179,6 @@ class AddReminderActivity : AppCompatActivity() {
             thePath = cursor.getString(columnIndex)
         }
         cursor.close()
-        //TODO find the directory that pictures are in
         return "/picturedirectorylol/$thePath"
-    }
-
-
+    }*/
 }

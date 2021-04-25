@@ -4,4 +4,7 @@
     <string name="num_reminders_key">num_reminders</string>
     <string name="imagesdir">reminder_images</string>
     <string name="notifications_channel_id">10001</string>
+    <string name="add_reminder">Add Reminder</string>
+    <string name="remove_reminder">Remove Reminder</string>
+    <string name="view_reminders">View Reminders</string>
 </resources>

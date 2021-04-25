@@ -12,6 +12,4 @@ class Reminder {
     var notificationText : String? = null
     var notificationId : Int = -1
 
-    constructor(){
-    }
 }
