@@ -98,8 +98,9 @@ class AddReminderActivity : AppCompatActivity() {
         scheduleNotification(buildNotification(createdReminder!!.notificationText!!), calculateDelay(createdReminder!!.date!!, createdReminder!!.time!!))
         var id = sharedPref!!.getInt(getString(R.string.num_reminders_key), -1)
         createdReminder!!.notificationId = id
-        id += 1
+
         with(sharedPref!!.edit()){
+            id += 1
             putInt(getString(R.string.num_reminders_key), id)
             commit()
         }
