@@ -78,6 +78,30 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
         return list
     }
 
+    fun getAllReminders() : MutableList<Reminder> {
+        val list: MutableList<Reminder> = ArrayList()
+        val db = this.readableDatabase
+        val query = "Select * from $REMINDERSTABLENAME"
+        val result = db.rawQuery(query, null)
+        val datesdf = SimpleDateFormat("yyyy-MM-dd")
+        val timesdf = SimpleDateFormat("HH:mm:ss")
+        if(result.moveToFirst()){
+            val r = Reminder()
+            val dString = result.getString(result.getColumnIndex(COL_DATE)).toString()
+            val tString = result.getString(result.getColumnIndex(COL_TIME)).toString()
+            val d = datesdf.parse(dString)
+            val t = timesdf.parse(tString)
+            r.date = Date(d.year, d.month, d.day)
+            r.time = Time(t.hours, t.minutes, t.seconds)
+            r.imageURI = Uri.parse(result.getString(result.getColumnIndex(COL_URI)))
+            r.notificationText = result.getString(result.getColumnIndex(COL_TEXT))
+            r.notificationId = result.getInt(result.getColumnIndex(COL_NOTIF_ID))
+            list.add(r)
+        }
+        result.close()
+        return list
+    }
+
     fun deleteReminder(r:Reminder){
         val db = this.readableDatabase
 

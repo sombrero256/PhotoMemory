@@ -11,5 +11,4 @@ class Reminder {
     var imageURI : Uri? = null
     var notificationText : String? = null
     var notificationId : Int = -1
-
 }
