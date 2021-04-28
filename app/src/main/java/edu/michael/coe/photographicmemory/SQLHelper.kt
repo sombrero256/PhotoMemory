@@ -85,7 +85,9 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
         val result = db.rawQuery(query, null)
         val datesdf = SimpleDateFormat("yyyy-MM-dd")
         val timesdf = SimpleDateFormat("HH:mm:ss")
-        if(result.moveToFirst()){
+        if(result.moveToFirst()) {
+            do {
+
             val r = Reminder()
             val dString = result.getString(result.getColumnIndex(COL_DATE)).toString()
             val tString = result.getString(result.getColumnIndex(COL_TIME)).toString()
@@ -97,15 +99,16 @@ class SQLHelper(var context: Context) : SQLiteOpenHelper(context, DATABASENAME, 
             r.notificationText = result.getString(result.getColumnIndex(COL_TEXT))
             r.notificationId = result.getInt(result.getColumnIndex(COL_NOTIF_ID))
             list.add(r)
+        } while(result.moveToNext())
         }
         result.close()
         return list
     }
 
-    fun deleteReminder(r:Reminder){
+    fun deleteReminderByNotificationId(i:Int){
         val db = this.readableDatabase
 
-        val del = "DELETE FROM " + REMINDERSTABLENAME + " WHERE " + COL_TEXT + "+" + " \'" + r.notificationText + "\'"
+        val del = "DELETE FROM " + REMINDERSTABLENAME + " WHERE " + COL_NOTIF_ID + "+" + " \'" + i.toString() + "\'"
         db.execSQL(del)
     }
 
